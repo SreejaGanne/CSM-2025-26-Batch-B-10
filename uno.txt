@@ -1,0 +1,138 @@
+#include <SoftwareSerial.h>
+
+int m1 = A0;
+int m2 = A1;
+int m3 = A2;
+int m4 = A3;
+
+int relay1 = 2;
+int relay2 = 3;
+int relay3 = 4;
+
+SoftwareSerial mySerial(5, 6);
+
+String value = "";
+String data = ""; 
+
+void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
+
+  pinMode(m1, OUTPUT);
+  pinMode(m2, OUTPUT);
+  pinMode(m3, OUTPUT);
+  pinMode(m4, OUTPUT);
+
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
+
+  // Motors OFF
+  Stop();
+
+  // 🔥 ACTIVE HIGH RELAY → LOW = OFF
+  digitalWrite(relay1, LOW);
+  digitalWrite(relay2, LOW);
+  digitalWrite(relay3, LOW);
+}
+
+void loop() {
+
+  // ===== Serial pump control from Raspberry Pi =====
+  if (Serial.available() > 0) {
+    data = Serial.readStringUntil('\n');
+    data.trim();  // VERY IMPORTANT
+    Serial.println(data);
+
+    if (data == "high") {
+      pump1();
+    } else if (data == "low") {
+      pump2();
+    } else if (data == "medium") {
+      pump3();
+    }
+  }
+
+  // ===== Manual & Voice command =====
+  if (mySerial.available() > 0) {
+    value = mySerial.readStringUntil('\n');
+    value.trim();
+
+    if (value == "F0") {
+      forward();
+    } else if (value == "B0") {
+      backward();
+    } else if (value == "L0") {
+      left();
+      delay(1000);
+      Stop();
+    } else if (value == "R0") {
+      right();
+      delay(1000);
+      Stop();
+    } else if (value == "X0") {
+      Stop();
+    } else if (value == "T0") {
+      Serial.println("ON");
+    }
+  }
+}
+
+// ================= MOTOR FUNCTIONS =================
+
+void backward() {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, HIGH);
+  digitalWrite(m3, HIGH);
+  digitalWrite(m4, LOW);
+}
+
+void forward() {
+  digitalWrite(m1, HIGH);
+  digitalWrite(m2, LOW);
+  digitalWrite(m3, LOW);
+  digitalWrite(m4, HIGH);
+}
+
+void right() {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, HIGH);
+  digitalWrite(m3, LOW);
+  digitalWrite(m4, HIGH);
+}
+
+void left() {
+  digitalWrite(m1, HIGH);
+  digitalWrite(m2, LOW);
+  digitalWrite(m3, HIGH);
+  digitalWrite(m4, LOW);
+}
+
+void Stop() {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, LOW);
+  digitalWrite(m3, LOW);
+  digitalWrite(m4, LOW);
+}
+
+// ================= PUMP FUNCTIONS =================
+
+// 🔥 ACTIVE HIGH RELAY → HIGH = ON, LOW = OFF
+
+void pump1() {
+  digitalWrite(relay1, HIGH);  // ON
+  delay(6000);
+  digitalWrite(relay1, LOW);  // OFF
+}
+
+void pump2() {
+  digitalWrite(relay2, HIGH);
+  delay(2000);
+  digitalWrite(relay2, LOW);
+}
+
+void pump3() {
+  digitalWrite(relay3, HIGH);
+  delay(4000);
+  digitalWrite(relay3, LOW);
+}
