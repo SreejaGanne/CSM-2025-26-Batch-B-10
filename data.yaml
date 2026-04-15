@@ -1,0 +1,13 @@
+train: C:/Users/0954/Desktop/tamota disease/train/images
+val: C:/Users/0954/Desktop/tamota disease/valid/images
+test: C:/Users/0954/Desktop/tamota disease/test/images
+
+nc: 4
+names: ['Blossom End Rot', 'bacetrial', 'cracking', 'normal']
+
+roboflow:
+  workspace: vijays-6xtbm
+  project: tamota-imbkv
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/vijays-6xtbm/tamota-imbkv/dataset/1
